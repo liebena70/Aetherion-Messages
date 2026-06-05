@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AETHERION MESSAGES BOX</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background-image: url('inagurasi.jpg'); /* */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            max-width: 550px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            font-weight: 700; margin-bottom: 15px;
+            background: linear-gradient(to right, #ffffff, #a0c4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle { font-size: 0.9rem; margin-bottom: 25px; opacity: 0.9; line-height: 1.6; }
+
+        .highlight-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.75rem;
+            color: #d1d8e0;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            text-align: left;
+        }
+
+        textarea {
+            width: 100%; padding: 18px; border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
+            color: white; font-size: 1rem; resize: none;
+            margin-bottom: 20px; outline: none;
+        }
+
+        .btn-send {
+            width: 100%; background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%);
+            color: white; padding: 15px; border-radius: 50px;
+            font-weight: 600; border: none; cursor: pointer;
+            transition: 0.3s; box-shadow: 0 8px 20px rgba(37, 117, 252, 0.3);
+        }
+
+        /* LOADING OVERLAY */
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(15px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+        }
+
+        .spinner {
+            width: 60px; height: 60px;
+            border: 6px solid rgba(255, 255, 255, 0.1);
+            border-top: 6px solid #2575fc;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .loading-text { color: white; font-weight: 600; font-size: 1.2rem; letter-spacing: 2px; }
+        
+        .hidden-field { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay">
+        <div class="loading-box">
+            <div class="spinner"></div>
+            <div class="loading-text">MENGIRIM PESAN...</div>
+            <p style="color: #a0c4ff; font-size: 0.8rem; margin-top: 10px;">Mohon tunggu, sedang memproses enkripsi anonymous</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>AETHERION MESSAGES</h1>
+        <p class="subtitle">Membangun Angkatan 13 SUD yang harmonis melalui aspirasi bermutu. Mohon untuk memberikan aspirasi yang bermutu</p>
+
+        <div class="highlight-box">
+            🛡️ <b>Privasi Terjamin:</b> Identitas Anda sepenuhnya anonymous. Pesan akan langsung diteruskan ke Admin Panel tanpa diketahui nama. Jika ingin menampilkan nama silakan memberikan nama pada pesan
+        </div>
+        
+        <form id="messageForm" action="submit.php" method="POST">
+            <input type="text" name="honeypot" class="hidden-field" tabindex="-1" autocomplete="off">
+            <textarea name="message" rows="5" placeholder="Tulis aspirasi kamu..." required></textarea>
+            <button type="submit" class="btn-send" id="submitBtn">Kirim Pesan 🚀</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('messageForm');
+        const overlay = document.getElementById('loading-overlay');
+
+        form.addEventListener('submit', function(e) {
+            // 1. Cegah form langsung pindah halaman
+            e.preventDefault();
+
+            // 2. Tampilkan loading overlay
+            overlay.style.display = 'flex';
+            
+            // 3. Ubah tombol
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = "Memproses...";
+            btn.style.opacity = "0.5";
+            btn.style.pointerEvents = "none";
+
+            // 4. Tunggu 5 detik baru kirim data ke PHP
+            setTimeout(function() {
+                form.submit();
+            }, 5000); // 5000 milidetik = 5 detik
+        });
+    </script>
+
+</body>
+</html>
